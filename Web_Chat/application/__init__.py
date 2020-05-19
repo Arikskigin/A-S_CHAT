@@ -8,9 +8,9 @@ def create_app():
 
     with app.app_context():
         # Imports
-        from website.application.views import view
-        from website.application.filters import _slice
-        from website.application.database import DataBase
+        from Web_Chat.application.routes import view
+        from Web_Chat.application.filters import _slice
+        from Web_Chat.application.local_database import DataBase
 
         # REGISTER ROUTES
         app.register_blueprint(view, url_prefix="/")

@@ -1,11 +1,11 @@
 from flask import render_template, url_for, redirect, request, session, jsonify, flash, Blueprint
-from website.application.database import DataBase
+from Web_Chat.application.local_database import DataBase
 
 view = Blueprint("views", __name__)
 
 # GLOBAL CONSTANTS
 NAME_KEY = 'name'
-MSG_LIMIT = 20
+MSG_LIMIT = 30
 
 
 # VIEWS
@@ -14,7 +14,6 @@ MSG_LIMIT = 20
 @view.route("/login", methods=["POST", "GET"])
 def login():
     """
-    displays main login page and handles saving name in session
     :exception POST
     :return: None
     """
@@ -25,7 +24,7 @@ def login():
             flash(f'You were successfully logged in as {name}.')
             return redirect(url_for("views.home"))
         else:
-            flash("1Name must be longer than 1 character.")
+            flash(" Your name must be longer than 1 character.")
 
     return render_template("login.html", **{"session": "session"})
 
@@ -37,7 +36,7 @@ def logout():
     :return: None
     """
     session.pop(NAME_KEY, None)
-    flash("0You were logged out.")
+    flash("You were logged out.")
     return redirect(url_for("views.login"))
 
 
@@ -57,7 +56,7 @@ def home():
 @view.route("/history")
 def history():
     if NAME_KEY not in session:
-        flash("0Please login before viewing message history")
+        flash("Please login first")
         return redirect(url_for("views.login"))
 
     json_messages = get_history(session[NAME_KEY])
@@ -70,10 +69,10 @@ def get_name():
     """
     :return: a json object storing name of logged in user
     """
-    data = {"name": ""}
+    data_name = {"name": ""}
     if NAME_KEY in session:
-        data = {"name": session[NAME_KEY]}
-    return jsonify(data)
+        data_name = {"name": session[NAME_KEY]}
+    return jsonify(data_name)
 
 
 @view.route("/get_messages")
@@ -81,44 +80,43 @@ def get_messages():
     """
     :return: all messages stored in database
     """
-    db = DataBase()
-    msgs = db.get_all_messages(MSG_LIMIT)
-    messages = remove_seconds_from_messages(msgs)
+    DB = DataBase()
+    messages = DB.get_all_messages(MSG_LIMIT)
+    messages_format = remove_seconds_from_messages(messages)
 
-    return jsonify(messages)
+    return jsonify(messages_format)
 
 
 @view.route("/get_history")
-def get_history(name):
+def get_history(your_name):
     """
-    :param name: str
-    :return: all messages by name of user
+    :param your_name:
+    :return: all messages by name
     """
-    db = DataBase()
-    msgs = db.get_messages_by_name(name)
-    messages = remove_seconds_from_messages(msgs)
+    DB = DataBase()
+    messages = DB.get_messages_by_name(your_name)
+    messages_format = remove_seconds_from_messages(messages)
 
-    return messages
+    return messages_format
 
 
 # UTILITIES
-def remove_seconds_from_messages(msgs):
+def remove_seconds_from_messages(messages):
     """
-    func to remove secounds from messages,decoration purpose only...
-    :param msgs: list
+    func to remove secs from messages
+    :param messages:
+
     :return: list
     """
-    messages = []
-    for msg in msgs:
+    list_messages = []
+    for msg in messages:
         message = msg
         message["time"] = remove_seconds(message["time"])
-        messages.append(message)
+        list_messages.append(message)
 
-    return messages
+    return list_messages
 
 
-def remove_seconds(msg):
-    """
-    :return: used by remove_seconds_from_messages to return string without secounds
-    """
-    return msg.split(".")[0][:-3]
+def remove_seconds(message):
+
+    return message.split(".")[0][:-3]
