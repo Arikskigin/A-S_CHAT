@@ -3,10 +3,10 @@
 Chat application
 
 
-Client:HTML5,CSS,JAVASCRIPT
+Client-side development used: HTML5, bootstrap, JavaScript.
+- Server-side development used: Python & Flask with a sqlite3 local database.
+- Functionality: Chat between users identified by the name they login with.
 
-
-Server:Python,Flask
 
 run by main.py file
 
